@@ -8660,7 +8660,7 @@ procesarPrograma = function(workbook) {
       rec.totalPlanificado = rec.unidades;
     });
   }
-  const registros = [...mapa.values()].sort((a,b)=>a.semana-b.semana || String(a.linea).localeCompare(String(b.linea)) || String(a.orden).localeCompare(String(b.orden)));
+  const registros = [...mapa.values()].sort((a,b)=>MOD8_SEMANAS.indexOf(a.semana) - MOD8_SEMANAS.indexOf(b.semana) || String(a.linea).localeCompare(String(b.linea)) || String(a.orden).localeCompare(String(b.orden)));
   console.log(`PROYECCION ESTAMPADO 8S: semanas ${MOD8_SEMANA_INICIO}-${MOD8_SEMANA_FIN}: ${registros.length} registros | celdas con unidades ${filasConUnidades}`);
   return registros;
 };
