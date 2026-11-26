@@ -227,7 +227,7 @@
     if (sub) sub.textContent = `${fechaIni} a ${fechaFin} · ${operaciones.length} operaciones con HC`;
 
     badges.innerHTML = `<span class="balance-visual-badge">Fuente <strong>${fuenteActiva === 'proyeccion' ? 'Proyección' : 'Programa'}</strong></span><span class="balance-visual-badge">Operaciones <strong>${operaciones.length}</strong></span><span class="balance-visual-badge">HC óptimo prom. <strong>${optimo.promedio.toFixed(1)}</strong></span>`;
-    cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${esc(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
+    cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><mod-eficiencia-actual class="balance-visual-card"></mod-eficiencia-actual><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${esc(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
 
     const thDias = fechas.map(iso => `<th>${nombreEncabezadoDia(iso)}</th>`).join('');
     const rows = operaciones.map(r => {
@@ -3398,6 +3398,26 @@ body.light-mode .mod8-weekly-table td.green { background: #dcfce7 !important; co
 body.light-mode .mod8-weekly-table td.red { background: #fee2e2 !important; color: #dc2626 !important; }
 body.light-mode .mod8-weekly-table td.cost { background: #dcfce7 !important; color: #047857 !important; }
 
+</style>
+<script>
+customElements.define('mod-eficiencia-actual', class extends HTMLElement {
+  connectedCallback() {
+    if (this.firstElementChild) return;
+    this.innerHTML = '<label><span>Eficiencia Actual</span><strong><input type="number" min="0" step="any" placeholder="—" aria-label="Eficiencia actual en porcentaje"> %</strong></label><em>Registro manual</em>';
+    const campo = this.querySelector('input');
+    const clave = location.pathname.split('/').filter(Boolean)[0] + '.eficienciaActual';
+    campo.value = localStorage.getItem(clave) || '';
+    campo.addEventListener('change', () => {
+      if (campo.reportValidity()) localStorage.setItem(clave, campo.value);
+    });
+  }
+});
+</script>
+<style>
+mod-eficiencia-actual {display:block}
+mod-eficiencia-actual label, mod-eficiencia-actual label > span, mod-eficiencia-actual strong {display:block}
+mod-eficiencia-actual input[type=number] {width:6ch;font:inherit;color:inherit;background:transparent;border:0;border-bottom:1px solid currentColor}
+@media(min-width:1100px){#balanceResumenVisualCards:has(mod-eficiencia-actual){grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column}}
 </style>
 </head>
 <body>
@@ -6624,7 +6644,7 @@ function renderizarResumenVisualBalance() {
     <span class="balance-visual-badge">Promedio semana <strong>${promedioDia.toFixed(1)}</strong></span>`;
 
   cards.innerHTML = `
-    <div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorDia[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div>
+    <div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorDia[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><mod-eficiencia-actual class="balance-visual-card"></mod-eficiencia-actual>
     <div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${esc(operacionMayor.operacion)} · promedio 8 semanas</em></div>
     <div class="balance-visual-card"><span>Promedio por semana</span><strong>${promedioDia.toFixed(1)}</strong><em>HC semanal promedio</em></div>
     <div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
@@ -9250,7 +9270,7 @@ renderizarResumenVisualBalance = function() {
   const fechaIni = nombreEncabezadoDia(fechas[0]); const fechaFin = nombreEncabezadoDia(fechas[fechas.length-1]);
   if (sub) sub.textContent = `${fechaIni} a ${fechaFin} · ${operaciones.length} operaciones con HC`;
   badges.innerHTML = `<span class="balance-visual-badge">Fuente <strong>${fuenteActiva === 'proyeccion' ? 'Proyección' : 'Programa'}</strong></span><span class="balance-visual-badge">Operaciones <strong>${operaciones.length}</strong></span><span class="balance-visual-badge">HC óptimo prom. <strong>${optimo.promedio.toFixed(1)}</strong></span>`;
-  cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${esc(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
+  cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><mod-eficiencia-actual class="balance-visual-card"></mod-eficiencia-actual><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${esc(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
   const thDias = fechas.map(iso => `<th>${nombreEncabezadoDia(iso)}</th>`).join('');
   const rows = operaciones.map(r => {
     const dias = fechas.map(iso => { const v = r.dias[iso] || 0; const scale = Math.max(.06, Math.min(1, v / maxCelda)); return `<td class="balance-visual-cell">${v > 0 ? v.toFixed(2) : '—'}${v > 0 ? `<span class="hc-bar" style="transform:scaleX(${scale})"></span>` : ''}</td>`; }).join('');
@@ -9669,7 +9689,7 @@ if (document.readyState === 'loading') {
     const fechaIni = nombreEncabezadoDia(fechas[0]); const fechaFin = nombreEncabezadoDia(fechas[fechas.length-1]);
     if (sub) sub.textContent = `${fechaIni} a ${fechaFin} · ${operaciones.length} operaciones con HC`;
     badges.innerHTML = `<span class="balance-visual-badge">Fuente <strong>${fuenteActiva === 'proyeccion' ? 'Proyección' : 'Programa'}</strong></span><span class="balance-visual-badge">Operaciones <strong>${operaciones.length}</strong></span><span class="balance-visual-badge">HC óptimo prom. <strong>${optimo.promedio.toFixed(1)}</strong></span>`;
-    cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${esc(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
+    cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><mod-eficiencia-actual class="balance-visual-card"></mod-eficiencia-actual><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${esc(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
 
     const thDias = fechas.map(iso => `<th>${nombreEncabezadoDia(iso)}</th>`).join('');
     const rows = operaciones.map(r => {
@@ -10085,7 +10105,7 @@ body.light-mode .mod8-week-hours-total { color: #b45309 !important; }
     const fechaIni = nombreEncabezadoDia(fechas[0]); const fechaFin = nombreEncabezadoDia(fechas[fechas.length-1]);
     if (sub) sub.textContent = `${fechaIni} a ${fechaFin} · ${operaciones.length} operaciones con HC`;
     badges.innerHTML = `<span class="balance-visual-badge">Fuente <strong>${fuenteActiva === 'proyeccion' ? 'Proyección' : 'Programa'}</strong></span><span class="balance-visual-badge">Operaciones <strong>${operaciones.length}</strong></span><span class="balance-visual-badge">HC óptimo prom. <strong>${optimo.promedio.toFixed(1)}</strong></span>`;
-    cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${escHtmlLocal(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
+    cards.innerHTML = `<div class="balance-visual-card"><span>Mayor carga semanal</span><strong>${totalPorSemana[isoMayor].toFixed(1)}</strong><em>${nombreEncabezadoDia(isoMayor)}</em></div><mod-eficiencia-actual class="balance-visual-card"></mod-eficiencia-actual><div class="balance-visual-card"><span>Operación crítica</span><strong>${operacionMayor.promedio.toFixed(1)}</strong><em>${escHtmlLocal(operacionMayor.operacion)} · promedio 8 semanas</em></div><div class="balance-visual-card"><span>HC óptimo promedio</span><strong>${optimo.promedio.toFixed(1)}</strong><em>HE estimadas ${optimo.heTotal.toFixed(1)}h · $${optimo.costoTotal.toFixed(0)}</em></div><div class="balance-visual-card"><span>Semanas evaluadas</span><strong>${fechas.length}</strong><em>${fechaIni} → ${fechaFin}</em></div>`;
     const thDias = fechas.map(iso => `<th>${nombreEncabezadoDia(iso)}</th>`).join('');
     const rows = operaciones.map(r => {
       const dias = fechas.map(iso => { const v = r.dias[iso] || 0; const scale = Math.max(.06, Math.min(1, v / maxCelda)); return `<td class="balance-visual-cell">${v > 0 ? v.toFixed(2) : '—'}${v > 0 ? `<span class="hc-bar" style="transform:scaleX(${scale})"></span>` : ''}</td>`; }).join('');
